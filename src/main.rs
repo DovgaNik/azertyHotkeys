@@ -1,4 +1,7 @@
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
+use std::thread::sleep;
+use std::time::Duration;
+
 fn main() {
     let mut key_pressed: bool = false;
     loop {
@@ -17,31 +20,22 @@ fn main() {
 
         if w_pressed && alt_gr_pressed && !key_pressed{
             unsafe { 
-                keybd_event(0xA5,
-                    0,
-                    KEYEVENTF_KEYUP,
-                    0);
-
-                keybd_event(0x4B,
-                    0,
-                    KEYEVENTF_EXTENDEDKEY,
-                    0);
-                keybd_event(0x4B,
-                    0,
-                    KEYEVENTF_KEYUP,
-                    0);
-
-                keybd_event(0xA5,
-                    0,
-                    KEYEVENTF_EXTENDEDKEY,
-                    0);
-                key_pressed = true;
+                send_less(); 
             };
+            key_pressed = true;
+        }
+
+        if x_pressed && alt_gr_pressed && !key_pressed{
+            unsafe { 
+                send_more(); 
+            };
+            key_pressed = true;
         }
 
         if !alt_gr_pressed && !w_pressed && !x_pressed {
             key_pressed = false;
         }
+        sleep(Duration::from_millis(50));
     }
 }
 
@@ -53,4 +47,36 @@ unsafe fn is_button_pressed(vkey_code: i32) -> bool {
     } else {
         return false;
     }
+}
+
+unsafe fn send_key_up(vkey_code: u8) {
+    keybd_event(vkey_code,
+        0,
+        KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP,
+        0);
+}
+
+unsafe fn send_key_down(vkey_code: u8) {
+    keybd_event(vkey_code,
+        0,
+        KEYEVENTF_EXTENDEDKEY | KEYBD_EVENT_FLAGS(0x00),
+        0);
+}
+
+unsafe fn send_less() {
+    send_key_up(0xA5); // releasing the alt gr key as it interferes with input      
+
+    send_key_down(0xE2);    
+    send_key_up(0xE2);  
+}
+
+unsafe fn send_more() {
+    send_key_up(0xA5); // releasing the alt gr key as it interferes with input
+
+    send_key_down(0x10);
+
+    send_key_down(0xE2);
+    send_key_up(0xE2);
+
+    send_key_up(0x10);
 }
