@@ -1,5 +1,4 @@
 use windows::Win32::UI::Input::KeyboardAndMouse::*;
-use windows::Win32::UI::WindowsAndMessaging::*;
 fn main() {
     let mut key_pressed: bool = false;
     loop {
@@ -14,10 +13,28 @@ fn main() {
         };
 
         println!("Alt Gr pressed: {alt_gr_pressed}, W pressed {w_pressed}, X pressed {x_pressed}, state of var {key_pressed}");
-        if alt_gr_pressed && w_pressed && x_pressed && !key_pressed{
+
+
+        if w_pressed && alt_gr_pressed && !key_pressed{
             unsafe { 
-                keybd_event(0x41, 0, KEYBD_EVENT_FLAGS(0), 0);
-                keybd_event(0x41, 0, KEYBD_EVENT_FLAGS(2), 0);
+                keybd_event(0xA5,
+                    0,
+                    KEYEVENTF_KEYUP,
+                    0);
+
+                keybd_event(0x4B,
+                    0,
+                    KEYEVENTF_EXTENDEDKEY,
+                    0);
+                keybd_event(0x4B,
+                    0,
+                    KEYEVENTF_KEYUP,
+                    0);
+
+                keybd_event(0xA5,
+                    0,
+                    KEYEVENTF_EXTENDEDKEY,
+                    0);
                 key_pressed = true;
             };
         }
@@ -27,7 +44,6 @@ fn main() {
         }
     }
 }
-
 
 unsafe fn is_button_pressed(vkey_code: i32) -> bool {
     let press_result: i16 = GetAsyncKeyState(vkey_code);
