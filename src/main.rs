@@ -3,46 +3,41 @@ use std::thread::sleep;
 use std::time::Duration;
 
 fn main() {
-    let mut key_pressed: bool = false;
     loop {
         let alt_gr_pressed: bool; // 0xA5
-        let w_pressed: bool; // 0x57
-        let x_pressed: bool; // 0x58
 
         unsafe { 
             alt_gr_pressed = is_button_pressed(0xA5);
-            w_pressed = is_button_pressed(0x57);
-            x_pressed = is_button_pressed(0x58);
         };
 
-        println!("Alt Gr pressed: {alt_gr_pressed}, W pressed {w_pressed}, X pressed {x_pressed}, state of var {key_pressed}");
+        if alt_gr_pressed {
+            let w_pressed: bool;
+            let x_pressed: bool;
 
-
-        if w_pressed && alt_gr_pressed && !key_pressed{
-            unsafe { 
-                send_less(); 
+            unsafe {
+                w_pressed = is_button_pressed(0x57); // 0x57
+                x_pressed = is_button_pressed(0x58); // 0x58
             };
-            key_pressed = true;
-        }
 
-        if x_pressed && alt_gr_pressed && !key_pressed{
-            unsafe { 
-                send_more(); 
-            };
-            key_pressed = true;
-        }
+            if w_pressed{
+                unsafe { 
+                    send_less(); 
+                };
+            } else if x_pressed{
+                unsafe { 
+                    send_more(); 
+                };
+            }
 
-        if !alt_gr_pressed && !w_pressed && !x_pressed {
-            key_pressed = false;
         }
-        sleep(Duration::from_millis(50));
+        sleep(Duration::from_millis(33));
     }
 }
 
 unsafe fn is_button_pressed(vkey_code: i32) -> bool {
     let press_result: i16 = GetAsyncKeyState(vkey_code);
 
-    if press_result != 0 {
+    if press_result == -32768 {
         return true;
     } else {
         return false;
@@ -68,6 +63,8 @@ unsafe fn send_less() {
 
     send_key_down(0xE2);    
     send_key_up(0xE2);  
+
+    send_key_down(0xA5);
 }
 
 unsafe fn send_more() {
@@ -79,4 +76,6 @@ unsafe fn send_more() {
     send_key_up(0xE2);
 
     send_key_up(0x10);
+
+    send_key_down(0xA5);
 }
