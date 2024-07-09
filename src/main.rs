@@ -11,12 +11,12 @@ fn main() {
         };
 
         if alt_gr_pressed {
-            let w_pressed: bool;
-            let x_pressed: bool;
+            let w_pressed: bool; // 0x57
+            let x_pressed: bool; // 0x58
 
             unsafe {
-                w_pressed = is_button_pressed(0x57); // 0x57
-                x_pressed = is_button_pressed(0x58); // 0x58
+                w_pressed = is_button_pressed(0x57);
+                x_pressed = is_button_pressed(0x58);
             };
 
             if w_pressed{
@@ -30,7 +30,7 @@ fn main() {
             }
 
         }
-        sleep(Duration::from_millis(33));
+        sleep(Duration::from_millis(50));
     }
 }
 
